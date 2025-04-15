@@ -6,13 +6,41 @@ on:
       - 'auth/**'
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  test:
+    runs-on: ubuntu-22.04
+
+    defaults:
+      run:
+        working-directory: auth
+
+    env:
+      MONGOMS_VERSION: 6.0.5
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # or your project's version
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: auth/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('auth/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install libssl1.1 manually
+        run: |
+          sudo apt-get update
+          wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+          sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb || true
 
       - name: Install dependencies
-        run: cd auth && npm install
+        run: npm install
 
       - name: Run tests
-        run: cd auth && MONGOMS_VERSION=6.0.5 npm run test:ci
+        run: npm run test:ci
