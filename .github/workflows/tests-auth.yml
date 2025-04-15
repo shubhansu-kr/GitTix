@@ -7,14 +7,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04  # Use 20.04 instead of latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install libssl1.1 for mongodb-memory-server
-        run: |
-          wget http://snapshot.debian.org/archive/debian-security/20221201T000000Z/pool/updates/main/o/openssl1.1/libssl1.1_1.1.1n-0+deb11u4_amd64.deb
-          sudo dpkg -i libssl1.1_1.1.1n-0+deb11u4_amd64.deb
 
       - name: Install dependencies
         run: cd auth && npm install
