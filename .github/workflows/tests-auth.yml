@@ -10,4 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: cd auth && npm install && npm run test:ci
+
+      - name: Install libssl1.1 for mongodb-memory-server
+        run: |
+          wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl1.1/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+          sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+
+      - name: Install dependencies
+        run: cd auth && npm install
+
+      - name: Run tests
+        run: cd auth && MONGOMS_VERSION=6.0.5 npm run test:ci
