@@ -1,18 +1,10 @@
 import { useEffect, useState } from 'react';
-import StripeCheckout from 'react-stripe-checkout';
 import Router from 'next/router';
 import useRequest from '../../hooks/use-request';
+import StripeCheckout from '../../components/StripeCheckout';
 
 const OrderShow = ({ order, currentUser }) => {
   const [timeLeft, setTimeLeft] = useState(0);
-  const { doRequest, errors } = useRequest({
-    url: '/api/payments',
-    method: 'post',
-    body: {
-      orderId: order.id,
-    },
-    onSuccess: () => Router.push('/orders'),
-  });
 
   useEffect(() => {
     const findTimeLeft = () => {
@@ -23,25 +15,19 @@ const OrderShow = ({ order, currentUser }) => {
     findTimeLeft();
     const timerId = setInterval(findTimeLeft, 1000);
 
-    return () => {
-      clearInterval(timerId);
-    };
+    return () => clearInterval(timerId);
   }, [order]);
 
   if (timeLeft < 0) {
-    return <div>Order Expired</div>;
+    return <div className="text-center text-red-600 mt-4">Order Expired</div>;
   }
 
   return (
-    <div>
-      Time left to pay: {timeLeft} seconds
-      <StripeCheckout
-        token={({ id }) => doRequest({ token: id })}
-        stripeKey="pk_test_JMdyKVvf8EGTB0Fl28GsN7YY"
-        amount={order.ticket.price * 100}
-        email={currentUser.email}
-      />
-      {errors}
+    <div className="max-w-xl mx-auto mt-6">
+      <div className="text-center text-gray-700 mb-4">
+        Time left to pay: <strong>{timeLeft}</strong> seconds
+      </div>
+      <StripeCheckout order={order} currentUser={currentUser} />
     </div>
   );
 };
