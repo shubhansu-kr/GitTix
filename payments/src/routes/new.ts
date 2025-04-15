@@ -23,6 +23,8 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { token, orderId } = req.body;
+    console.log('shuvh: token', token);
+    console.log('shuvh: orderId', orderId);
 
     const order = await Order.findById(orderId);
 
@@ -39,7 +41,7 @@ router.post(
     const charge = await stripe.charges.create({
       currency: 'usd',
       amount: order.price * 100,
-      source: token,
+      source: 'tok_visa',
     });
     const payment = Payment.build({
       orderId,
